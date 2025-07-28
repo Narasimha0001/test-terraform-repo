@@ -1,2 +1,1 @@
-# test-terraform-repo
-My awesome codebase created using terraform
+This is a README file for the test-terraform-repo.
