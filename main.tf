@@ -2,15 +2,15 @@
 #   region = "eu-west-3"
 # }
 
-# resource "aws_s3_bucket" "my_bucket" {
-#   bucket = "narasimha-bucket-for-training200825"   # must be globally unique
-#   force_destroy = true   # allows bucket to be deleted even if it has objects
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = "narasimha-bucket-for-training200825"   # must be globally unique
+  force_destroy = true   # allows bucket to be deleted even if it has objects
 
-#   tags = {
-#     Name        = "MyTrainingBucket"
-#     Environment = "Dev"
-#   }
-# }
+  tags = {
+    Name        = "MyTrainingBucket"
+    Environment = "Dev"
+  }
+}
 
 
 provider "aws" {
