@@ -1,0 +1,60 @@
+---
+- hosts: jenkins
+  become: true
+  tasks:
+    - name: Ensure prerequisites are installed
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - gnupg
+          - curl
+        state: present
+        update_cache: yes
+
+    - name: Remove existing Jenkins repo file if any
+      file:
+        path: /etc/apt/sources.list.d/jenkins.list
+        state: absent
+
+    - name: Remove existing Jenkins keyring if any
+      file:
+        path: /usr/share/keyrings/jenkins.gpg
+        state: absent
+
+    - name: Download Jenkins GPG key (ASCII format)
+      get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        dest: /tmp/jenkins.asc
+        mode: '0644'
+
+    - name: Convert Jenkins key to GPG format
+      command: "gpg --dearmor -o /usr/share/keyrings/jenkins.gpg /tmp/jenkins.asc"
+      args:
+        creates: /usr/share/keyrings/jenkins.gpg
+
+    - name: Add Jenkins repository
+      copy:
+        dest: /etc/apt/sources.list.d/jenkins.list
+        content: "deb [signed-by=/usr/share/keyrings/jenkins.gpg] https://pkg.jenkins.io/debian-stable binary/\n"
+        mode: '0644'
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Java 17
+      apt:
+        name: openjdk-17-jdk
+        state: present
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present
+
+    - name: Enable and start Jenkins service
+      service:
+        name: jenkins
+        state: started
+        enabled: yes

@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'maven'   
+        jdk 'jdk'       
+    }
+
+    environment {
+        SSH_KEY_ID = 'Narasimha'    
+    }
+
+    stages {
+        stage('Clone Repo') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Narasimha0001/SpringBoot.git'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Verify Files') {
+            steps {
+                sh 'ls -l'
+            }
+        }
+
+        stage('Deploy to App Server') {
+            steps {
+                sshagent(credentials: [SSH_KEY_ID]) {
+                    sh '''
+                        ansible-playbook -i inventory.ini webserver.yml --user ubuntu
+                    '''
+                }
+            }
+        }
+    }
+}
